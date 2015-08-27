@@ -279,7 +279,7 @@ $(function () {
 			return type.map(function (t) {
 				var full = list[t];
 				
-				return full.name;
+				return full ? full.name : null;
 			});
 		},
 
