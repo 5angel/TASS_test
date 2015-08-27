@@ -382,8 +382,7 @@ $(function () {
 	var carouselTypes = new CarouselTypeCollection(),
 		carousels     = new CarouselCollection();
 
-	carouselTypes.fetch({ error: onCarouselTypesFetchError });
-	carousels.fetch({ error: onCarouselsFetchError });
+	carouselTypes.add(remote.types); // небольшой хак, чтобы не глючило из-за асинхронности
 
 	var CAROUSEL_COLLECTIONS = {
 		carouselTypes: carouselTypes,
@@ -392,6 +391,9 @@ $(function () {
 
 	var carouselSearchFormView = new CarouselSearchFormView({ collection: CAROUSEL_COLLECTIONS }),
 	    carouselListView       = new CarouselListView({ collection: CAROUSEL_COLLECTIONS });
+
+	carouselTypes.fetch({ error: onCarouselTypesFetchError });
+	carousels.fetch({ error: onCarouselsFetchError });
 
 	// Отдельно напишем обработчики, чтобы имитировать ответ с сервера
 	function onCarouselSearchFormError(self, res, req) {
