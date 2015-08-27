@@ -1,57 +1,434 @@
 <!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta charset="UTF-8">
-    <title>Tass test by 5angel</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-  </head>
-  <body>
-    <section class="page-header">
-      <h1 class="project-name">Tass test</h1>
-      <h2 class="project-tagline"></h2>
-      <a href="https://github.com/5angel/TASS_test" class="btn">View on GitHub</a>
-      <a href="https://github.com/5angel/TASS_test/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/5angel/TASS_test/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title></title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<!-- Backbone не работает без JQuery --->
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<!-- И без Underscore тоже ничего не пашет --->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<!-- Вот теперь порядок -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.2/backbone-min.js"></script>
+<!-- Хотя нет, сверху еще навесим Handlebars, потому что в скобочках сила --->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.3/handlebars.min.js"></script>
+<!-- Вот теперь можно начинать -->
+</head>
+<body>
+<div class="container">
+	<div class="page-header">
+	  <h1>Аттракционы <small>Тестовое задание ТАСС</small></h1>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<!-- А вот сюда рендерится списочек -->
+			<div id="carousel-list"></div>
+		</div>
+		<div class="col-md-6">
+			<!-- Тут у нас формочка -->
+			<div id="carousel-form"></div>
+		</div>
+	</div>
+</div>
+<!-- Шаблоны-шаблончики -->
+<script type="text/template" id="carousel-form-tpl">
+<form class="form-horizontal">
+	<div class="form-group">
+		<label for="name" class="col-sm-3 control-label">Название</label>
+		<div class="col-sm-9">
+			<input type="text" name="name" id="name" class="form-control" placeholder="Название">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="type" class="col-sm-3 control-label">Тип</label>
+		<div class="col-sm-9">
+			<select id="type" name="type" class="form-control">
+				<option value="">-- Выберите тип --</option>
+				{{#each []}}
+				<option value="{{ this.id }}">{{ this.name }}</option>
+				{{/each}}
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="type" class="col-sm-3 control-label">Напряженность</label>
+		<div class="col-sm-9">
+			<!-- Вот где-то на этом моменте я начал уставать ковыряться --->
+			<select id="type" name="type" class="form-control">
+				<option value="">-- Выберите степень --</option>
+				<option value="0">Сон</option>
+				<option value="1">Круиз</option>
+				<option value="2">С ветерком</option>
+				<option value="3">Держитесь крепче</option>
+				<option value="4">Уже страшно</option>
+				<option value="5">Адреналин</option>
+				<option value="5">Страшновато</option>
+				<option value="7">Очень страшно</option>
+				<option value="8">Безумие</option>
+				<option value="9">Кошмар</option>
+				<option value="10">АД</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="min-age" class="col-sm-3 control-label">Возраст</label>
+		<div class="col-sm-9">
+			<input type="number" min="0" max="99" name="minAge" id="min-age" class="form-control" placeholder="Возраст">
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-9 col-sm-offset-3">
+			<ul class="list-unstyled list-inline">
+				<li>
+					<div class="checkbox">
+						<label><input type="checkbox" name="havePhoto">Фотографии</label>
+					</div>
+				</li><li>
+					<div class="checkbox">
+						<label><input type="checkbox" name="haveVideo"> Видео</label>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-9 col-sm-offset-3">
+			<button type="submit" class="btn btn-primary">Искать</button>
+		</div>
+	</div>
+</form>
+</script>
+<script type="text/template" id="carousel-list-tpl">
+{{#if []}}
+<ul class="list-unstyled">
+	{{#each []}}
+	<li>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h2 class="panel-title">{{this.name}} <sup>({{this.minAge}}+)</sup></h2>
+				<ul class="list-unstyled list-inline">
+					{{#each this.typeTitled }}
+					<li>
+						<span class="label label-primary">{{this}}</span>
+					</li>
+					{{/each}}
+				</ul>
+				<small>Напряженность: {{ this.intensity }}</small>
+			</div>
+			<div class="panel-body">{{this.desc}}</div>
+		</div>
+	</li>
+	{{/each}}
+</ul>
+{{else}}
+<div class="alert alert-info">Ничего нет</div>
+{{/if}}
+</script>
+<!-- Инлайним код, потому что почему бы и нет? -->
+<script type="text/javascript">
+$(function () {
+	/** ========================= От автора =========================
+	  * Задание действительно довольно простое – забрать модель с
+	  * сервера и показать на странице – что может быть проще?
+	  * Если говорить об Ангуляре, то в нем достаточно добавить
+	  * модель в scope и прописать в html байндинги. Но мы же не 
+	  * MVW/MVVM-фреймворк, поэтому любые взаимодействия
+	  * имплементируются ручками. Я посмотрел на Marionette, но не
+	  * увидел в нем каких-то разительных отличий в том, что делало
+	  * бы его более человекопонятным.
+	  * В любом случае, я решил выделить день и сесть за изучение
+	  * документации и stack overflow, чтобы добиться внятного
+	  * результата. И хотя, скорее всего, архитектурно данный пример
+	  * далек от совершенства, он выполняет поставленные задачи.
+	  * ============================================================= */
 
-    <section class="main-content">
-      <h3>
-<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+	// Немного ASCII-арта, чтобы дополнительно понтануться
+	var SPLASH = [
+	'  _________________________________',
+	' /___   ___/  ___   /  ____/  ____/\\',
+	' \\__/  /\\_/  /__/  /  /___/  /\\___\\/',
+	'   /  / //  ___   /  /___/  /_/_',
+	'  /__/ //__/\\_/__/______/______/\\',
+	'  \\__\\/ \\__\\/ \\__\\______\\______\\/',
+	'Уполномочен заявить!'
+	];
+	SPLASH.forEach(function (str) { console.log(str); }); // \m/ (-_-) \m/
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here <a href="https://guides.github.com/features/mastering-markdown/">using GitHub Flavored Markdown</a>, select a template crafted by a designer, and publish. After your page is generated, you can check out the new <code>gh-pages</code> branch locally. If you’re using GitHub Desktop, simply sync your repository and you’ll see the new branch.</p>
+	// Имитируем сервер
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+	var ServerDummy = (function () {
+		function ServerDummy(types, carousels) {
+			this.types = types;
+			this.carousels = carousels;
+		}
 
-<p>We’ve crafted some handsome templates for you to use. Go ahead and click 'Continue to layouts' to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved.</p>
+		ServerDummy.parseBoolean = function (value) {
+			switch (value) {
+				case 'true': return true;
+				case 'false': return false;
+				default: return undefined;
+			}
+		};
 
-<h3>
-<a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating pages manually</h3>
+		ServerDummy.parseWith = function (value, transform) {
+			return _.isUndefined(value) || value === '' ? undefined : transform(value);
+		};
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+		ServerDummy.prototype.clearBlanks = function (obj) {
+			for (var prop in obj) {
+				if (obj.hasOwnProperty(prop) && _.isUndefined(obj[prop])) {
+					delete obj[prop];
+				}
+			}
+		};
 
-<h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+		ServerDummy.prototype.retrieveCarousels = function (params) {
+			params = params || {};
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor’s GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+			var parse = ServerDummy.parseWith;
 
-<h3>
-<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+			// Валидируем параметры, на всякий случай
+			params.type      = parse(params.type, parseInt);
+			params.intensity = parse(params.intensity, parseInt);
+			params.havePhoto = parse(params.havePhoto, ServerDummy.parseBoolean);
+			params.haveVideo = parse(params.haveVideo, ServerDummy.parseBoolean);
+			params.minAge    = parse(params.minAge, parseInt);
 
-<p>Having trouble with Pages? Check out our <a href="https://help.github.com/pages">documentation</a> or <a href="https://github.com/contact">contact support</a> and we’ll help you sort it out.</p>
+			this.clearBlanks(params);
 
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/5angel/TASS_test">Tass test</a> is maintained by <a href="https://github.com/5angel">5angel</a>.</span>
+			return this.carousels.filter(function (item) {
+				var included = true;
+				
+				for (var prop in params) {
+					if (params.hasOwnProperty(prop)) {
+						var target = item[prop],
+							value  = params[prop];
 
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-      </footer>
+						if (prop === 'name' || prop === 'type') {
+							included = target.indexOf(value) !== -1;
+						} else if (prop === 'havePhoto' || prop === 'haveVideo') {
+							included = target === value;
+						} else if (prop === 'minAge') {
+							included = target >= value;
+						} else if (prop === 'intensity') {
+							included = target === value;
+						}
+					}
+				}
 
-    </section>
+				return included;
+			});
+		};
 
-  
-  </body>
+		return ServerDummy;
+	})();
+
+	var remote = new ServerDummy([{
+		id: 0,
+		name: 'Тибетские горки'
+	}, {
+		id: 1,
+		name: 'Американские горки'
+	}, {
+		id: 2,
+		name: 'Туалет'
+	}], [{
+		name : 'Shambala',
+		type : [0],
+		intensity : 10,
+		havePhoto : true,
+		haveVideo : true,
+		minAge : 7,
+		desc : 'Самые высокие горки в Европе. Высота - 90 метров!'
+	}, {
+		name: 'Mr Bones Wild Ride',
+		type : [1, 2],
+		intensity : 0,
+		havePhoto : true,
+		haveVideo : true,
+		minAge : 0,
+		desc : 'Все хотят слезть с этой дикой поездки'
+	}]);
+
+	// Начинаем задавать модельки
+
+	var CarouselTypeModel = Backbone.Model.extend({
+		defaults: {
+			id: null,
+			name: 'N/A'
+		}
+	});
+
+	var CarouselModel = Backbone.Model.extend({
+		defaults: {
+			name: 'N/A',
+			type: [0],
+			intensity: 0,
+			havePhoto: false,
+			haveVideo: false,
+			minAge: 0,
+			desc: 'N/A'
+		},
+
+		// TODO ¯\_(ツ)_/¯ Модель, которая зависит от коллекции, в которую она не входит?
+		// TODO Подумать, можно ли это имплиментировать более прямо
+		getTypeTitled: function (type) {
+			var list = carouselTypes.toJSON();
+
+			return type.map(function (t) {
+				var full = list[t];
+				
+				return full.name;
+			});
+		},
+
+		serialize: function () {
+			var json = this.toJSON();
+
+			json.typeTitled = this.getTypeTitled(json.type);
+
+			return json;
+		}
+	});
+
+	// Теперь коллекции
+
+	var CarouselTypeCollection = Backbone.Collection.extend({
+		url: 'types',
+		model: CarouselTypeModel
+	});
+
+	var CarouselCollection = Backbone.Collection.extend({
+		url: 'carousels',
+		model: CarouselModel,
+		// TODO По идее, должен быть способ сериализовывать автоматически
+		// TODO – пропатчить Backbone?
+		serialize: function () {
+			return this.models.map(function (m) {
+				return m.serialize();
+			});
+		}
+	});
+
+	// И наконец Вьюхи
+
+	var CarouselSearchFormView = Backbone.View.extend({
+		el: '#carousel-form',
+
+		events: {
+			'submit': 'onFormSubmit'
+		},
+
+		onFormSubmit: function (e) {
+			e.preventDefault();
+
+			var attrs = {};
+
+			this.$el.find('input[name], select[name]').each(function () {
+				switch (this.type) {
+					case 'checkbox':
+						if (this.checked) {
+							attrs[this.name] = this.checked;
+						}
+						break;
+					default:
+						if (this.value !== '') {
+							attrs[this.name] = this.value;
+						}
+						break;
+				}
+			});
+
+			this.collection.carousels.fetch({
+				data:  $.param(attrs),
+				error: onCarouselSearchFormError
+			});
+		},
+
+		initialize: function () {
+			this.collection.carouselTypes.on('add', this.render, this);
+
+			this.render();
+		},
+
+		render: function () {
+			var html = $('#carousel-form-tpl').html(),
+				json = this.collection.carouselTypes.toJSON();
+
+			this.$el.html(Handlebars.compile(html)(json));
+		}
+	});
+
+	var CarouselListView = Backbone.View.extend({
+		el: '#carousel-list',
+
+		initialize: function () {
+			this.collection.carousels.on('add',   this.render, this);
+			this.collection.carousels.on('reset', this.render, this);
+		},
+
+		render: function () {
+			var html = $('#carousel-list-tpl').html(),
+				json = this.collection.carousels.serialize();
+
+
+			this.$el.html(Handlebars.compile(html)(json));
+		}
+	});
+
+	// Смотрим, что у нас получилось
+
+	var carouselTypes = new CarouselTypeCollection(),
+		carousels     = new CarouselCollection();
+
+	var CAROUSEL_COLLECTIONS = {
+		carouselTypes: carouselTypes,
+		carousels:     carousels
+	};
+
+	var carouselSearchFormView = new CarouselSearchFormView({ collection: CAROUSEL_COLLECTIONS }),
+	    carouselListView       = new CarouselListView({ collection: CAROUSEL_COLLECTIONS });
+
+	carouselTypes.fetch({ error: onCarouselTypesFetchError });
+	carousels.fetch({ error: onCarouselsFetchError });
+
+	// Отдельно напишем обработчики, чтобы имитировать ответ с сервера
+	function onCarouselSearchFormError(self, res, req) {
+		var attrs = {};
+
+		req.data.split('&')
+			.forEach(function (pair) {
+				var arr = pair.split('=').map(decodeURIComponent);
+				attrs[arr[0]] = arr[1];
+			});
+
+		self.reset(); // чистим-чистим-чистим
+		remote.retrieveCarousels(attrs).forEach(self.add.bind(self));
+	}
+
+	function onCarouselTypesFetchError(self) {
+		remote.types.forEach(self.add.bind(self));
+	}
+
+	function onCarouselsFetchError(self) {
+		remote.retrieveCarousels().forEach(self.add.bind(self));
+	}
+
+	/** ======================== Послесловие ========================
+	  * Мария упоминала, что данное задание можно сделать за 2 часа.
+	  * Если вычесть время (часа 3), которое я провел за чтением
+	  * документации и изучением примеров, то, наверное, так и
+	  * получится. Но как часто бывает в таких вещах – есть нюансы.
+	  * Создание полноценной странички с подобным функционалом с нуля
+	  * займет всю рабочую неделю, потому что по-хорошему нам здесь
+	  * потребуются нестандартные контролы, удобная пагинация,
+	  * рубрикатор и т.д. и т.п.
+	  * И это не говоря о разработке дизайна, пользовательского
+	  * взаимодействия, настройке среды, написании интеграционных
+	  * тестов и тестировании.
+	  * ============================================================= */
+})
+</script>
+</body>
 </html>
