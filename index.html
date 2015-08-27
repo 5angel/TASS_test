@@ -275,11 +275,11 @@ $(function () {
 		// TODO Подумать, можно ли это имплиментировать более прямо
 		getTypeTitled: function (type) {
 			var list = carouselTypes.toJSON();
-
+			console.log(list);
 			return type.map(function (t) {
 				var full = list[t];
 				
-				return full ? full.name : null;
+				return full.name;
 			});
 		},
 
