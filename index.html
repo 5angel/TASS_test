@@ -275,7 +275,7 @@ $(function () {
 		// TODO Подумать, можно ли это имплиментировать более прямо
 		getTypeTitled: function (type) {
 			var list = carouselTypes.toJSON();
-			console.log(list);
+
 			return type.map(function (t) {
 				var full = list[t];
 				
@@ -382,6 +382,9 @@ $(function () {
 	var carouselTypes = new CarouselTypeCollection(),
 		carousels     = new CarouselCollection();
 
+	carouselTypes.fetch({ error: onCarouselTypesFetchError });
+	carousels.fetch({ error: onCarouselsFetchError });
+
 	var CAROUSEL_COLLECTIONS = {
 		carouselTypes: carouselTypes,
 		carousels:     carousels
@@ -389,9 +392,6 @@ $(function () {
 
 	var carouselSearchFormView = new CarouselSearchFormView({ collection: CAROUSEL_COLLECTIONS }),
 	    carouselListView       = new CarouselListView({ collection: CAROUSEL_COLLECTIONS });
-
-	carouselTypes.fetch({ error: onCarouselTypesFetchError });
-	carousels.fetch({ error: onCarouselsFetchError });
 
 	// Отдельно напишем обработчики, чтобы имитировать ответ с сервера
 	function onCarouselSearchFormError(self, res, req) {
