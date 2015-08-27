@@ -233,6 +233,9 @@ $(function () {
 	}, {
 		id: 2,
 		name: 'Туалет'
+	}, {
+		id: 3,
+		name: 'Чашечки'
 	}], [{
 		name : 'Shambala',
 		type : [0],
@@ -249,6 +252,22 @@ $(function () {
 		haveVideo : true,
 		minAge : 0,
 		desc : 'Все хотят слезть с этой дикой поездки'
+	}, {
+		name: 'Чай у меня дома',
+		type : [2],
+		intensity : 5,
+		havePhoto : false,
+		haveVideo : false,
+		minAge : 20,
+		desc : 'Хардкорное чайовничье'
+	}, {
+		name: 'Ночевка на вокзале',
+		type : [2, 3],
+		intensity : 9,
+		havePhoto : true,
+		haveVideo : false,
+		minAge : 18,
+		desc : 'Картонная каробка включена в стоимость'
 	}]);
 
 	// Начинаем задавать модельки
